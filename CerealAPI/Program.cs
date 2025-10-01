@@ -17,17 +17,16 @@ var app = builder.Build();
 
 if (args.Length == 1 && args[0].ToLower() == "seeddata")
 {
+    Console.WriteLine("Seeding Data...");
     SeedData(app);
 }
 
 void SeedData(IHost app)
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        var context = services.GetRequiredService<CerealContext>();
-        context.Database.EnsureCreated();
-    }
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+    using var scope = scopedFactory.CreateScope();
+    var service = scope.ServiceProvider.GetService<Seed>();
+    service.SeedDataContext();
 }
 
 // Configure the HTTP request pipeline.

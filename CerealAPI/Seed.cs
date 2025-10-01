@@ -1,4 +1,5 @@
 using CerealAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CerealAPI
 {
@@ -8,32 +9,43 @@ namespace CerealAPI
 
         public void SeedDataContext()
         {
+            Console.WriteLine("No Context?");
             if (!cerealContext.Cereals.Any())
             {
+                Console.WriteLine("There was no Context!");
+                cerealContext.Manufacturers.RemoveRange(cerealContext.Manufacturers);
                 var manufacturers = new List<Model.Manufacturer>
                 {
+                    new() { Shortform = 'A', Name = "American Home Food Products" },
                     new() { Shortform = 'G', Name = "General Mills" },
                     new() { Shortform = 'K', Name = "Kellogg's" },
                     new() { Shortform = 'N', Name = "Nabisco" },
                     new() { Shortform = 'P', Name = "Post" },
-                    new() { Shortform = 'Q', Name = "Quaker Oats" }
+                    new() { Shortform = 'Q', Name = "Quaker Oats" },
+                    new() { Shortform = 'R', Name = "Ralston Purina" }
                 };
                 cerealContext.Manufacturers.AddRange(manufacturers);
+
+                cerealContext.Types.RemoveRange(cerealContext.Types);
                 var types = new List<Model.Type>
                 {
                     new() { Shortform = 'C', Name = "Cold" },
                     new() { Shortform = 'H', Name = "Hot" }
                 };
                 cerealContext.Types.AddRange(types);
+                cerealContext.SaveChanges();
 
-                using (StreamReader sr = new StreamReader("Data/cereal.csv"))
+                using (StreamReader sr = new StreamReader("../Data/cereal.csv"))
                 {
+                    Console.WriteLine("Found csv file");
                     var headerLine = sr.ReadLine(); // Read and ignore the header line
                     var typeLine = sr.ReadLine(); // Read and ignore the types line
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
                         var values = line.Split(';');
+                        Console.WriteLine("" + manufacturers.Find(m => m.Shortform == values[1][0]).Shortform
+                                        + " " + types.Find(t => t.Shortform == values[2][0]).Shortform);
                         var cereal = new Model.Cereal
                         {
                             Name = values[0],
@@ -56,7 +68,9 @@ namespace CerealAPI
                         cerealContext.Cereals.Add(cereal);
                     }
                 }
+                Console.WriteLine("save?");
                 cerealContext.SaveChanges();
+                Console.WriteLine("saved");
             }
         }
     }
