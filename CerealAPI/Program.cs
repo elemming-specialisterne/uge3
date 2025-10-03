@@ -3,12 +3,16 @@ using CerealAPI.Data;
 using CerealAPI.Interfaces;
 using CerealAPI.Repository;
 using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddTransient<Seed>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ICerealRepository, CerealRepository>();
+builder.Services.AddScoped<IManufactorerRepository, ManufactorerRepository>();
+builder.Services.AddScoped<ITypeRepository, TypeRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<CerealContext>(options =>
